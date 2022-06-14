@@ -2,29 +2,24 @@ import { Between, In } from 'typeorm'
 import {BookRepository , BookGenreRepository} from './serviceInstances'
 
 export const getAllBooks = async(data) =>{
-    let relation = {relations:["genre"],}
-    let pagination = {}
-    let filters = {}
-    if(data.page){
-        pagination = {
-            skip:data.page * data.limit,
-            limit:data.limit,
-        }
-    }
-    if(data.range){
-        filters = {
-            where:{
-                genre: In(data.genre),
-                price: Between(data.range[0],data.range[1]),
-                rating:data.rating
-            }
-        }
-    }
-    const options = {...pagination , ...filters}
-    return BookRepository.find({
-        ...relation,
-        ...options
-
+    console.log("data",data , data.page , data.limit)
+    let options = {};
+    let pagination = {};
+    let filters = {};
+    (data.page !== undefined && data.limit !== undefined) ? pagination = {skip : data.page*data.limit , take : data.limit } : console.log("haha") ;
+    console.log("paginations",pagination)
+    data.genre && data.genre.length > 0 ?
+     filters = {genre:{
+        genre: In(data.genre)
+    }, ...filters} : '' ;
+    data.range ? filters = { price:Between(data.range[0],data.range[1]), ...filters} : '' ;
+    data.rating ? filters = {rating : data.rating , ...filters} : '' ;
+    
+    options = {...pagination , where:{...filters}}
+    console.log(options)
+    return BookRepository.findAndCount({
+        relations:["genre"],
+        ...options    
     });
 }
 

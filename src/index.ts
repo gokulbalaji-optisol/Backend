@@ -12,7 +12,8 @@ import bookRouter from './routes/book';
 import cartRouter from './routes/cart';
 import orderRouter from './routes/order';
 import paymentRouter from './routes/payment';
-import adminRouter from './routes/admin'
+import adminRouter from './routes/admin';
+import bannerRouter from './routes/banner';
 import * as path from 'path';
 import paymentController from '../src/controllers/PaymentController'
 const multer = require('multer');
@@ -46,6 +47,7 @@ app.use('/cart',cartRouter);
 app.use('/payment',paymentRouter);
 app.use('/order',orderRouter);
 app.use('/admin',adminRouter);
+app.use('/banner',bannerRouter);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'images')));
 //app.use(express.static('public'));  

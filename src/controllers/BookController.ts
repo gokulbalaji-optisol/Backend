@@ -35,17 +35,21 @@ export default class BookController {
     };
 
     static getAll = async (req : Request , res: Response) => {
+      console.log("body",req.body)
       const {page , limit } = req.body;
       var payload;
       payload = {
         page , limit
       }
-      if(req.body.filters){
-      const {rating ,genre , range} = req.body.filters
-      payload = {
-        page,limit , rating,genre, range
-      }
-      }
+      req.body.range ? payload = { ...payload , range:req.body.range} : '';
+      req.body.rating ? payload = { ...payload , rating:req.body.rating} : '';
+      req.body.genre ? payload = { ...payload , genre:req.body.genre} : '';
+      // if(req.body.range){
+      // const {rating ,genre , range} = req.body
+      // payload = {
+      //   page,limit , rating,genre, range
+      // }
+      // }
       const data = await getAllBooks(payload);
       res.send(
 

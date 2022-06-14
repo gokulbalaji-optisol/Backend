@@ -7,7 +7,7 @@ import { checkRole } from '../middleware/auth/checkRole'
 const router = Router();
 
 //view book
-router.get("/getAllBook",BookController.getAll)
+router.post("/getAllBook",BookController.getAll)
 router.get("/getBookByGenreId",BookController.getBookByGenreId);
 
 //get Book by id

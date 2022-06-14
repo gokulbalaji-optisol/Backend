@@ -9,11 +9,13 @@ import { getAllGenreData, getGenreData } from "../services/genreServices";
 
 export default class BookGenreController {
     static getGenres = async (req: Request, res: Response) => {
-      const take = req.query.limit;
-      const skip = req.query.page * take;
-      console.log(take,skip)
-        await getGenreData(take ,skip).then(d=>{
-          console.log(d)
+     
+      let options={}
+      req.query.limit ? options= { take:req.query.limit , ...options} : ''
+      req.query.limit && req.query.page ? options= { skip:req.query.page * req.query.limit , ...options} : ''
+      console.log(options)
+        await getGenreData(options).then(d=>{  
+          console.log("genre" ,d)
           res.send(d);
         }).catch(err=>console.log(err));
     };

@@ -1,9 +1,8 @@
 import { BookGenreRepository } from "./serviceInstances"
 
-export const getGenreData =  async (take,skip) => {
+export const getGenreData =  async (data) => {
          return  BookGenreRepository.findAndCount({
-          take,
-          skip
+          ...data
         })
 }
 
