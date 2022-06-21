@@ -6,85 +6,108 @@ import { UserRoles } from "../entity/UserRoles";
 import { User } from "../entity/User";
 import { BookGenre } from "../entity/BookGenre";
 import { Order } from "../entity/Order";
+import { adminServices } from "../services";
+export default class AdminController {
+  static async getBooks(req: Request, res: Response) {
+    await adminServices
+      .getBooks()
+      .then((data) => {
+        res.send(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // const BookRepository = AppDataSource.getRepository(Book);
+    // const BookData = await BookRepository.find({
+    //   relations: ["user", "genre"],
+    // });
+    // res.send(BookData);
+  }
+  static async getUsers(req: Request, res: Response) {
+    const { page, limit } = req.params;
+    let options = { skip: page, take: limit };
+    const UserRepository = AppDataSource.getRepository(User);
+    const UserData = await UserRepository.findAndCount({
+      ...options,
+    });
+    res.send(UserData);
+  }
+  static async getGenres(req: Request, res: Response) {
+    const BookGenreRepository = AppDataSource.getRepository(BookGenre);
+    const BookGenreData = await BookGenreRepository.find();
+    res.send(BookGenreData);
+  }
+  static async getOrders(req: Request, res: Response) {
+    const { page, limit } = req.params;
+    let options = { skip: page, take: limit };
+    const OrderRepository = AppDataSource.getRepository(Order);
+    const OrderData = await OrderRepository.findAndCount({
+      relations: [
+        "user_id",
+        "addr_id",
+        "order_details_id",
+        "order_details_id.book_id",
+        "order_details_id.book_id.user",
+      ],
+      ...options,
+    });
+    res.send(OrderData);
+  }
 
-export default class AdminController{
-    static getBooks = async(req:Request , res:Response) => {
-        const BookRepository = AppDataSource.getRepository(Book);
-        const BookData = await BookRepository.find({
-            relations:["user","genre"]
-        });
-        res.send(BookData);
+  static async delBook(req: Request, res: Response) {
+    const id = req.params.id;
+    const BookRepository = AppDataSource.getRepository(Book);
+    const BookData = await BookRepository.findOne({
+      where: { id: id },
+    });
+    try {
+      await BookRepository.remove(BookData);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
     }
-    static getUsers = async(req:Request , res:Response) => {
-        const UserRepository = AppDataSource.getRepository(User);
-        const UserData = await UserRepository.find();
-        res.send(UserData);
+    res.send("Book Deleted");
+  }
+  static async delUser(req: Request, res: Response) {
+    const id = req.params.id;
+    const UserRepository = AppDataSource.getRepository(User);
+    const UserData = await UserRepository.findOne({
+      where: { id: id },
+    });
+    try {
+      await UserRepository.remove(UserData);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
     }
-    static getGenres = async(req:Request , res:Response) => {
-        const BookGenreRepository = AppDataSource.getRepository(BookGenre);
-        const BookGenreData = await BookGenreRepository.find();
-        res.send(BookGenreData);
+    res.send("User Deleted");
+  }
+  static async delGenre(req: Request, res: Response) {
+    const id = req.params.id;
+    const BookGenreRepository = AppDataSource.getRepository(BookGenre);
+    const BookGenreData = await BookGenreRepository.find({
+      where: { id: id },
+    });
+    try {
+      await BookGenreRepository.remove(BookGenreData);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
     }
-    static getOrders = async(req:Request , res:Response) => {
-        const OrderRepository = AppDataSource.getRepository(Order);
-        const OrderData = await OrderRepository.find({
-            relations:["user_id","addr_id","order_details_id","order_details_id.book_id","order_details_id.book_id.user"]
-        });
-        res.send(OrderData);
+    res.send("Book Genre Deleted");
+  }
+  static async delOrder(req: Request, res: Response) {
+    const id = req.params.id;
+    const OrderRepository = AppDataSource.getRepository(Order);
+    const OrderData = await OrderRepository.find({
+      where: { id: id },
+    });
+    try {
+      await OrderRepository.remove(OrderData);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
     }
-
-    static delBook = async(req:Request , res:Response) => {
-        const id = req.params.id;
-        const BookRepository = AppDataSource.getRepository(Book);
-        const BookData = await BookRepository.findOne({
-            where:{id:id}
-        });
-        try{
-            await BookRepository.remove(BookData);
-        }
-        catch(err){console.log(err); res.send(err) }
-        res.send("Book Deleted")
-
-    }
-    static delUser = async(req:Request , res:Response) => {
-        const id = req.params.id;
-        const UserRepository = AppDataSource.getRepository(User);
-        const UserData = await UserRepository.findOne({
-            where:{id:id}
-        });
-        try{
-            await UserRepository.remove(UserData);
-        }
-        catch(err){console.log(err); res.send(err) }
-        res.send("User Deleted")
-
-    }
-    static delGenre = async(req:Request , res:Response) => {
-        const id = req.params.id;
-        const BookGenreRepository = AppDataSource.getRepository(BookGenre);
-        const BookGenreData = await BookGenreRepository.find({
-            where:{id:id}
-        });
-        try{
-            await BookGenreRepository.remove(BookGenreData);
-        }
-        catch(err){console.log(err); res.send(err) }
-        res.send("Book Genre Deleted")
-
-    }
-    static delOrder = async(req:Request , res:Response) => {
-        const id = req.params.id;
-        const OrderRepository = AppDataSource.getRepository(Order);
-        const OrderData = await OrderRepository.find({
-            where:{id:id}
-        });
-        try{
-            await OrderRepository.remove(OrderData);
-        }
-        catch(err){console.log(err); res.send(err) }
-        res.send("Order Deleted")
-
-    }
-
+    res.send("Order Deleted");
+  }
 }
-

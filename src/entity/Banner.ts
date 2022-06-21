@@ -1,22 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column , CreateDateColumn , UpdateDateColumn} from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 @Entity()
 export class Banner {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number
+  @Column()
+  img: string;
 
-    @Column()
-    img: string;
+  @Column()
+  sequence: number;
 
-    @Column()
-    sequence : number;
+  @Column()
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @Column()
-    @CreateDateColumn()
-    createdAt: Date;
-
-    @Column()
-    @UpdateDateColumn()
-    updatedAt: Date;
-
+  @Column()
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
