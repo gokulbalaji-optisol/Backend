@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column , Unique, CreateDateColumn , UpdateDateColumn, JoinColumn, OneToOne, OneToMany, ManyToOne, ManyToMany} from "typeorm"
-import { Length, IsNotEmpty , IsEmail} from "class-validator";
+import { Entity, PrimaryGeneratedColumn, Column , Unique, CreateDateColumn , UpdateDateColumn, JoinColumn, OneToOne, OneToMany, ManyToOne, ManyToMany} from "typeorm";
 import * as bcrypt from "bcryptjs";
 import { UserRoles } from "./UserRoles";
 import { Book } from "./Book";

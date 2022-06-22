@@ -24,7 +24,7 @@ apis
 
     -checkout
         -/checkout                  final display of all products to be ordered and get shipping address
-            -send an invoice to the mail 
+           
     -payment
         -.payment/gateway
     -order

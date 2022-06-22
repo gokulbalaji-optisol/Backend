@@ -27,7 +27,7 @@ class AuthController {
     user.company = req.body.company;
   }
   else {
-    role = Userroles.USER
+    role = Userroles.USER ;
   }console.log(role);
     const UserRolesRepository = AppDataSource.getRepository(UserRoles);  
     let roles = await UserRolesRepository.findOne({where:{role }});
@@ -85,7 +85,8 @@ class AuthController {
         relations:["userrole"]
       });
     } catch (error) {
-      res.status(401).send();
+      console.log(error)
+      res.status(401).send(error);
     }
 
     //Check if encrypted password match
