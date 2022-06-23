@@ -9,6 +9,7 @@ export default class BannerController {
   static getAll = async (req: Request, res: Response) => {
     await getAllBanner()
       .then((data) => {
+        console.log("banner", data);
         res.send(data);
       })
       .catch((err) => {

@@ -2,17 +2,16 @@ import { Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";
 import { User } from "../entity/User";
-import {Userroles} from '../config/config';
+import { Userroles } from "../config/config";
 import { AppDataSource } from "../data-source";
 import { UserRoles } from "../entity/UserRoles";
 import { Book } from "../entity/Book";
 import { Order } from "../entity/Order";
-class UserController{
-
-static listAll = async (req: Request, res: Response) => {
-  //Get users from database
-  const userRepository = AppDataSource.getRepository(User);
-  /* filter part
+class UserController {
+  static listAll = async (req: Request, res: Response) => {
+    //Get users from database
+    const userRepository = AppDataSource.getRepository(User);
+    /* filter part
   let role;
   if(req.path == "/users/getAllUsers"){
     role = Userroles.SELLER;
@@ -28,18 +27,18 @@ static listAll = async (req: Request, res: Response) => {
     relations:['role'] ,
      where:{ role: {role : role} }
     });*/
-  //Send the users object
+    //Send the users object
 
-  const users = await userRepository.find({
-    relations:['userrole'] 
+    const users = await userRepository.find({
+      relations: ["userrole"],
     });
-  res.send(users);
-};
+    res.send(users);
+  };
 
-static listAllOnlyUsers = async (req: Request, res: Response) => {
-  //Get users from database
-  const userRepository = AppDataSource.getRepository(User);
-  /* filter part
+  static listAllOnlyUsers = async (req: Request, res: Response) => {
+    //Get users from database
+    const userRepository = AppDataSource.getRepository(User);
+    /* filter part
   let role;
   if(req.path == "/users/getAllUsers"){
     role = Userroles.SELLER;
@@ -55,87 +54,95 @@ static listAllOnlyUsers = async (req: Request, res: Response) => {
     relations:['role'] ,
      where:{ role: {role : role} }
     });*/
-  //Send the users object
-  const UserRolesRepository = AppDataSource.getRepository(UserRoles);  
-  const userrole = await UserRolesRepository.find({where:{role:Userroles.USER}});
-  const users = await userRepository.find({
-    relations:['userrole'],
-    where:{userrole: true} 
+    //Send the users object
+    const UserRolesRepository = AppDataSource.getRepository(UserRoles);
+    const userrole = await UserRolesRepository.find({
+      where: { role: Userroles.USER },
     });
-  res.send(users);
-};
+    const users = await userRepository.find({
+      relations: ["userrole"],
+      where: { userrole: true },
+    });
+    res.send(users);
+  };
 
-///seller
+  ///seller
 
+  static getSellerBooks = async (req: Request, res: Response) => {
+    const id = res.locals.jwtPayload.userId;
 
-static getSellerBooks = async (req: Request, res: Response) => {
-  const id = res.locals.jwtPayload.userId;
-  const BookRepository = AppDataSource.getRepository(User);
-  const BookData = await BookRepository.findOne({
-    relations:["books", "books.genre" ] , 
-    where:{id:id}
-  });
-  console.log("books",BookData);
-  res.send(BookData.books);
-};
+    const BookRepository = AppDataSource.getRepository(User);
+    const BookData = await BookRepository.findOne({
+      relations: ["books", "books.genre"],
+      where: { id: id },
+    });
+    console.log("books", BookData);
+    res.send({ data: BookData.books, count: BookData.books.length });
+  };
 
-static getSellerOrders = async (req:Request , res:Response) =>{
-  const id = res.locals.jwtPayload.userId;
-  const OrderRepository = AppDataSource.getRepository(Order);
-  const BookData = await OrderRepository.find({
-    relations:["user_id","addr_id", "order_details_id","order_details_id.book_id","order_details_id.book_id.user" ] , 
-    where:{
-      order_details_id:{
-        book_id:{
-          user:{
-            id:id
-          }
-        }
-      }
-    }
-  });
-  res.send(BookData);
-};
+  static getSellerOrders = async (req: Request, res: Response) => {
+    const id = res.locals.jwtPayload.userId;
+    const OrderRepository = AppDataSource.getRepository(Order);
+    const BookData = await OrderRepository.findAndCount({
+      relations: [
+        "user_id",
+        "addr_id",
+        "order_details_id",
+        "order_details_id.book_id",
+        "order_details_id.book_id.user",
+      ],
+      where: {
+        order_details_id: {
+          book_id: {
+            user: {
+              id: id,
+            },
+          },
+        },
+      },
+    });
+    res.send(BookData);
+  };
 
-static getBookById = async(req: Request, res: Response) =>{
-  const book_id = req.params.id;
-  const user_id = res.locals.jwtPayload.userId;
-  const UserRepository = AppDataSource.getRepository(User);
-  const BookRepository = AppDataSource.getRepository(Book);
-  const BookData = await UserRepository.findOne({
-    relations:["books", "books.genre"] , 
-    where:{
-      id:user_id,
-      books:{
-        id:book_id
-      }
-    }
-  });
+  static getBookById = async (req: Request, res: Response) => {
+    const book_id = req.params.id;
+    const user_id = res.locals.jwtPayload.userId;
+    const UserRepository = AppDataSource.getRepository(User);
+    const BookRepository = AppDataSource.getRepository(Book);
+    const BookData = await UserRepository.findOne({
+      relations: ["books", "books.genre"],
+      where: {
+        id: user_id,
+        books: {
+          id: book_id,
+        },
+      },
+    });
 
-  res.send(BookData);
-}
+    res.send(BookData);
+  };
 
-static deleteBookById = async(req: Request, res: Response) =>{
-  console.log("delete consoller")
-  const book_id = req.params.id;
-  const user_id = res.locals.jwtPayload.userId;
-  const UserRepository = AppDataSource.getRepository(User);
-  const BookRepository = AppDataSource.getRepository(Book);
-  const BookData = await UserRepository.findOne({
-    relations:["books", "books.genre"] , 
-    where:{
-      id:user_id,
-      books:{
-        id:book_id
-      }
-    }
-  });
-  console.log("delete controller",BookData.books[0]);
-  //console.log("deel ",BookData);
-  await BookRepository.remove(BookData.books[0]);
-  res.send("Deleted Successfully");
-}
-/*
+  static deleteBookById = async (req: Request, res: Response) => {
+    console.log("delete consoller");
+    const book_id = req.params.id;
+    const user_id = res.locals.jwtPayload.userId;
+    const UserRepository = AppDataSource.getRepository(User);
+    const BookRepository = AppDataSource.getRepository(Book);
+    const BookData = await UserRepository.findOne({
+      relations: ["books", "books.genre"],
+      where: {
+        id: user_id,
+        books: {
+          id: book_id,
+        },
+      },
+    });
+    console.log("delete controller", BookData.books[0]);
+    //console.log("deel ",BookData);
+    await BookRepository.remove(BookData.books[0]);
+    res.send("Deleted Successfully");
+  };
+  /*
 static getOneById = async (req: Request, res: Response) => {
   //Get the ID from the url
   const id = req.params.id;
@@ -236,6 +243,6 @@ static deleteUser = async (req: Request, res: Response) => {
   res.status(204).send();
 };
 */
-};
+}
 
 export default UserController;
