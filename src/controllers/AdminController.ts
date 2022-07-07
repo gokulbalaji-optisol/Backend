@@ -7,6 +7,7 @@ import { User } from "../entity/User";
 import { BookGenre } from "../entity/BookGenre";
 import { Order } from "../entity/Order";
 import { adminServices } from "../services";
+import { ILike } from "typeorm";
 export default class AdminController {
   static async getBooks(req: Request, res: Response) {
     await adminServices
@@ -24,12 +25,26 @@ export default class AdminController {
     // res.send(BookData);
   }
   static async getUsers(req: Request, res: Response) {
-    const { page, limit } = req.params;
-    let options = { skip: page, take: limit };
+    //const { page, limit, srh } = req.query;
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const srh = req.query.srh;
+    console.log(req.query);
+    let pagination = req.query.limit ? { skip: page * limit, take: limit } : {};
+    let search = req.query.srh
+      ? {
+          where: {
+            username: ILike(`${srh}%`),
+          },
+        }
+      : {};
+    let options = { ...pagination, ...search };
+    console.log("user", options);
     const UserRepository = AppDataSource.getRepository(User);
     const UserData = await UserRepository.findAndCount({
       ...options,
     });
+    console.log(UserData);
     res.send(UserData);
   }
   static async getGenres(req: Request, res: Response) {

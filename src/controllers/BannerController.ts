@@ -7,7 +7,8 @@ import {
 } from "../services/bannerServices";
 export default class BannerController {
   static getAll = async (req: Request, res: Response) => {
-    await getAllBanner()
+    console.log("this");
+    return await getAllBanner()
       .then((data) => {
         console.log("banner", data);
         res.send(data);

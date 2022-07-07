@@ -2,6 +2,7 @@ import { Router } from "express";
 import { Userroles } from "../config/config";
 import AdminController from "../controllers/AdminController";
 import BookGenreController from "../controllers/BookGenreController";
+import PaymentController from "../controllers/PaymentController";
 import { checkJwt } from "../middleware/auth/checkJwt";
 import { checkRole } from "../middleware/auth/checkRole";
 
@@ -17,8 +18,8 @@ router.get(
 );
 router.get(
   "/getUsers",
-  //checkJwt,
-  //checkRole([Userroles.ADMIN]),
+  checkJwt,
+  checkRole([Userroles.ADMIN]),
   AdminController.getUsers
 );
 router.get(
@@ -65,4 +66,63 @@ router.get(
 
 //edit book
 
+//coupons
+
+//list
+router.get(
+  "/listAllCoupon",
+  checkJwt,
+  checkRole([Userroles.ADMIN]),
+  PaymentController.listAllCoupon
+);
+//add coupon
+router.post(
+  "/createCoupon",
+  checkJwt,
+  checkRole([Userroles.ADMIN]),
+  PaymentController.createCoupon
+);
+
+//promo code
+
+//list
+router.get(
+  "/listAllPromoCode",
+  checkJwt,
+  checkRole([Userroles.ADMIN]),
+  PaymentController.listAllPromoCode
+);
+//add coupon
+router.post(
+  "/createPromoCode",
+  checkJwt,
+  checkRole([Userroles.ADMIN]),
+  PaymentController.createPromoCode
+);
+
+//update promocode
+
+router.post(
+  "/updatePromoCode",
+  checkJwt,
+  checkRole([Userroles.ADMIN]),
+  PaymentController.updatePromoCode
+);
+
+//delete coupon
+router.post(
+  "/deleteCoupon",
+  checkJwt,
+  checkRole([Userroles.ADMIN]),
+  PaymentController.deleteCoupon
+);
+
+//getPromoCOdeById
+
+router.get(
+  "/getPromoCodeByCouponId",
+  checkJwt,
+  checkRole([Userroles.ADMIN]),
+  PaymentController.getPromoCodeByCouponId
+);
 export default router;
